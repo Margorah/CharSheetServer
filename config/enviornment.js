@@ -3,7 +3,7 @@ var db = process.env.DATABASE || 'mongodb';
 
 if (env === 'development') {
     process.env.PORT = 3000;
-    process.env.HOSTNAME = '192.168.200.100';
+    process.env.HOSTNAME = 'localhost';
 }
 
 if (db === 'mongodb') {
