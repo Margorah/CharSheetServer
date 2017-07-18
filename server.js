@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 
 var server = express();
 
-server.user(bodyParser.json());
+server.use(bodyParser.json());
 
 server.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,32 +16,69 @@ server.use((req, res, next) => {
     next();
 });
 
+dbCallSimple = (dbMethod, errCode, reqObj, resObj) => {
+    dbMethod(reqObj, (error, success) => {
+        if (error) {
+            resObj.status(errCode).send(error);
+        }
+        resObj.send(success);
+    });
+};
 
+// User
+server.get('/Users/:email/Pass/:pass', (req, res) => {
+    dbCallSimple(db.user.get, 404, req, res);
+});
 
-// const http = require('http');
+server.post('/Users', (req, res) => {
+    dbCallSimple(db.user.post, 404, req, res);
+});
 
-// const routes = require('./routes/routes');
-// const db = require('./db/mongo.js');
+server.patch('/Users/:uid/Password', (req, res) => {
+    dbCallSimple(db.user.patchUserPass, 404, req, res);
+});
 
-// var server = http.createServer().listen(process.env.PORT, process.env.HOSTNAME);
+server.delete('/Users/:uid/', (req, res) => {
+    dbCallSimple(db.user.deleteById, 400, req, res);
+});
 
-// console.log(`Server Running On: ${process.env.HOSTNAME}:${process.env.PORT}`);
-// db.connect();
+// Character
+server.get('/Users/:uid/Characters', (req, res) => {
+    dbCallSimple(db.character.getAll, 404, req, res);
+});
 
-// server.on('request', (req, res) => {    
+server.post('/Users/:uid/Characters', (req, res) => {
+    dbCallSimple(db.character.postNewChar, 404, req, res);
+});
 
-//     console.log('Heard Request');
-//     routes(req, res, (error, result) => {   
-//         // for now just 404 if url doesn't have a route
-//         //console.log(`Error: ${error}, Result: ${result}`);
-//         console.log('About to respond to Request');
-//         if (error) {
-//             res.writeHead(404, {'Content-Type': 'text/html'});
-//             console.log(error);
-//             res.end();
-//         }
-//         // for now just print routes return result
-//         res.writeHead(200, {'Content-Type': 'text/html'});
-//         res.end(`<H1>Your temp response</H1><h2>${result}</h2>`);
-//     });
-// });
+server.patch('/Users/:uid/Characters/:cid', (req, res) => {
+    dbCallSimple(db.character.patchCharName, 404, req, res);
+});
+
+server.delete('/Users/:uid/Characters/:cid', (req, res) => {
+    dbCallSimple(db.character.deleteCharById, 404, req, res);
+});
+
+// Rename a Character??
+
+// Character - Stats
+server.get('/Users/:uid/Characters/:cid', (req, res) => {
+    dbCallSimple(db.character.getById, 404, req, res);
+});
+
+server.post('/Users/:uid/Characters/:cid/Stats', (req, res) => {
+    dbCallSimple(db.character.postNewStat, 404, req, res);
+});
+
+server.patch('/Users/:uid/Characters/:cid/Stats/:name', (req, res) => {
+    dbCallSimple(db.character.patchStatByName, 404, req, res);
+});
+
+server.delete('/Users/:uid/Characters/:cid/Stats/:name', (req, res) => {
+    dbCallSimple(db.character.deleteStatByName, 404, req, res);
+});
+
+// Hey! Listen!
+server.listen(process.env.PORT, process.env.HOSTNAME, () => {
+    console.log(`Listening on ${process.env.HOSTNAME}:${process.env.PORT}`);
+});
