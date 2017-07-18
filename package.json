@@ -1,0 +1,14 @@
+{
+  "name": "charsheetng2 backend",
+  "version": "1.0.0",
+  "description": "the node.js backend for the angular4 app",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fritz",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^2.2.29"
+  }
+}
