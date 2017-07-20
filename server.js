@@ -3,6 +3,8 @@ require('./config/enviornment');
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const authenticate = require(process.env.AUTH);
+
 var server = express();
 
 server.use(bodyParser.json());
@@ -17,64 +19,76 @@ server.use((req, res, next) => {
 });
 
 dbCallSimple = (dbMethod, errCode, reqObj, resObj) => {
-    dbMethod(reqObj, (error, success) => {
+    dbMethod(reqObj, (error, success, token) => {
         if (error) {
             resObj.status(errCode).send(error);
         }
-        resObj.send(success);
+        if (token) {
+            resObj.header('x-auth', token).send(success);
+        } else {
+            resObj.send(success);
+        }
     });
 };
 
 // User
-server.get('/Users/:email/Pass/:pass', (req, res) => {
-    dbCallSimple(db.user.get, 404, req, res);
-});
-
 server.post('/Users', (req, res) => {
     dbCallSimple(db.user.post, 404, req, res);
 });
 
-server.patch('/Users/:uid/Password', (req, res) => {
+server.get('/Users/Me', authenticate, (req, res) => {
+    dbCallSimple(db.user.auth, 401, req, res);
+});
+
+server.post('/Users/Me', (req, res) => {
+    dbCallSimple(db.user.login, 401, req, res);
+});
+
+server.delete('/Users/Me', authenticate, (req, res) => {
+    dbCallSimple(db.user.logout, 400, req, res);
+});
+
+server.patch('/Users/Password', authenticate, (req, res) => {
     dbCallSimple(db.user.patchUserPass, 404, req, res);
 });
 
-server.delete('/Users/:uid/', (req, res) => {
+server.delete('/Users/', authenticate, (req, res) => {
     dbCallSimple(db.user.deleteById, 400, req, res);
 });
 
 // Character
-server.get('/Users/:uid/Characters', (req, res) => {
+server.get('/Users/Characters', authenticate, (req, res) => {
     dbCallSimple(db.character.getAll, 404, req, res);
 });
 
-server.post('/Users/:uid/Characters', (req, res) => {
+server.post('/Users/Characters', authenticate, (req, res) => {
     dbCallSimple(db.character.postNewChar, 404, req, res);
 });
 
-server.patch('/Users/:uid/Characters/:cid', (req, res) => {
-    dbCallSimple(db.character.patchCharName, 404, req, res);
+server.delete('/Users/Characters', authenticate, (req, res) => {
+    dbCallSimple(db.character.deleteCharById, 404, req, res);
 });
 
-server.delete('/Users/:uid/Characters/:cid', (req, res) => {
-    dbCallSimple(db.character.deleteCharById, 404, req, res);
+server.patch('/Users/Characters/Name', authenticate, (req, res) => {
+    dbCallSimple(db.character.patchCharName, 404, req, res);
 });
 
 // Rename a Character??
 
 // Character - Stats
-server.get('/Users/:uid/Characters/:cid', (req, res) => {
+server.get('/Users/Characters/:id', authenticate, (req, res) => {
     dbCallSimple(db.character.getById, 404, req, res);
 });
 
-server.post('/Users/:uid/Characters/:cid/Stats', (req, res) => {
+server.post('/Users/Characters/Stats', authenticate, (req, res) => {
     dbCallSimple(db.character.postNewStat, 404, req, res);
 });
 
-server.patch('/Users/:uid/Characters/:cid/Stats/:name', (req, res) => {
+server.patch('/Users/Characters/Stats', authenticate, (req, res) => {
     dbCallSimple(db.character.patchStatByName, 404, req, res);
 });
 
-server.delete('/Users/:uid/Characters/:cid/Stats/:name', (req, res) => {
+server.delete('/Users/Characters/Stats', authenticate, (req, res) => {
     dbCallSimple(db.character.deleteStatByName, 404, req, res);
 });
 

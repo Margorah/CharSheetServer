@@ -1,4 +1,5 @@
 const mg = require('mongoose');
+const User = require('./user');
 
 var StatSchema = new mg.Schema({
     name: {
@@ -27,6 +28,11 @@ var CharacterSchema = new mg.Schema({
         type: String,
         required: true,
         minlength: 2
+    },
+    owner: {
+        required: true,
+        type: mg.Schema.Types.ObjectId,
+        ref: 'User'
     },
     stats: [StatSchema]
 });

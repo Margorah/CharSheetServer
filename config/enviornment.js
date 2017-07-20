@@ -1,12 +1,12 @@
-var env = process.env.NODE_ENV || 'development';
-var db = process.env.DATABASE || 'mongodb';
+const env = process.env.NODE_ENV || 'development';
+const db = process.env.DATABASE || 'mongodb';
 
-if (env === 'development') {
-    process.env.PORT = 3000;
-    process.env.HOSTNAME = 'localhost';
-}
+if (env === 'development' || env === 'test') {
+    const config = require('./config.json');
+    const envConfig = config[env][db];
 
-if (db === 'mongodb') {
-    process.env.MONGODB_URI = 'mongodb://localhost:27017/CharSheetApp';
-    require('./../db/mongo/mongodb');
+    Object.keys(envConfig).forEach((key) => {
+        process.env[key] = envConfig[key];
+    });
+    require(process.env.PATH);
 }

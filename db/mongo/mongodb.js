@@ -11,14 +11,6 @@ var connectPromse = mongoose.connect(process.env.MONGODB_URI, {
 
 module.exports = db = {
     user: {
-        get: (req, callback) => {
-            User.findOne({ email: req.params.email.toLowerCase(), password: req.params.pass })
-                .lean()
-                .select('_id name')
-                .then((userDoc) => {
-                    callback(undefined, userDoc);
-                }).catch(e => callback(e));
-        },
         post: (req, callback) => {
             var user = new User({
                 name: req.body.name,
@@ -26,66 +18,82 @@ module.exports = db = {
                 password: req.body.password,
                 characters: []
             });
-            user.save().then((doc) => {
-                callback(undefined, { id: doc._id, name: doc.name, email: doc.email });
+            user.save().then(() => {
+                return user.generateAuthToken();
+            }).then((token) => {
+                callback(undefined, { id: user._id, name: user.name, email: user.email }, token);
+            }).catch(e => callback(e));
+        },
+        auth: (req, callback) => {
+            callback(undefined, { id: req.user.id });
+        },
+        login: (req, callback) => {
+            User.findByCredentials(req.body.email, req.body.password)
+                .then((user) => {
+                    return user.generateAuthToken().then((token) => {
+                        callback(undefined, { id: user._id }, token);
+                    });
+                }).catch(e => callback(e));
+        },
+        logout: (req, callback) => {
+            req.user.removeToken(req.token).then(() => {
+                callback(undefined, "OK");
             }).catch(e => callback(e));
         },
         patchUserPass: (req, callback) => {
-            console.log('Not Implemented!');
+            // console.log('Not Implemented!');
+            req.user.changePassword(req.body.old, req.body.new)
+                .then((newDoc) => {
+                    newDoc.save().then(() => {
+                        callback(undefined, 'Password Changed');
+                    }).catch(e => callback(e));
+                }).catch(e => callback(e));
         },
         deleteById: (req, callback) => {
-            console.log('Not Implemented!');
+            // console.log('Not Implemented!');
+            req.user.remove().then(() => {
+                callback(undefined, 'User Removed');
+            }).catch(e => callback(e));
         }
     },
     character: {
         getAll: (req, callback) => {
-            User.findById(req.params.uid)
+            Character.find({ owner: req.user._id })
                 .lean()
-                .populate('characters', '_id name')
-                .then((docs) => {
-                    // if (docs.characters.length < 1) {
-                    //     docs.characters = 'None'
-                    // }
-                    callback(undefined, docs.characters);
+                .select('_id, name')
+                .then((charDocs) => {
+                    callback(undefined, charDocs);
                 }).catch(e => callback(e));
         },
         postNewChar: (req, callback) => {
-            User.findById(req.params.uid)
-                .then((userDoc) => {
-                    var char = new Character({
-                        name: req.body.name,
-                        stats: []
-                    });
-                    char.save().then((charDoc) => {
-                        userDoc.update({ $push: { characters: charDoc._id } })
-                            .then(() => {
-                                callback(undefined, charDoc._id);
-                            }).catch(e => callback(e));
+            var char = new Character({
+                name: req.body.name,
+                owner: req.user._id,
+                stats: []
+            });
+            char.save().then((charDoc) => {
+                req.user.update({ $push: { characters: charDoc._id } })
+                    .then(() => {
+                        callback(undefined, charDoc._id);
                     }).catch(e => callback(e));
-                }).catch(e => callback(e));
+            }).catch(e => callback(e));
         },
         patchCharName: (req, callback) => {
-            Character.findByIdAndUpdate(req.params.cid, { $set: { name: req.body.name } }, { safe: true, new: true, runValidators: true })
+            Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id }, { $set: { name: req.body.name } }, { safe: true, new: true, runValidators: true })
                 .then((doc) => {
                     callback(doc.name);
                 }).catch(e => callback(e));
         },
         deleteCharById: (req, callback) => {
-            User.findById(req.params.uid)
-                .then((userDoc) => {
-                    Character.findByIdAndRemove(req.params.cid)
-                        .then(() => {
-                            userDoc.update({ $pull: { characters: req.params.cid } })
-                                .then(() => {
-                                    callback(undefined, 'Complete!');
-                                }).catch(e => callback(e));
-                        }).catch(e => callback(e));
+            Character.findOneAndRemove({ _id: req.body.id, owner: req.user._id })
+                .then(() => {
+                    callback(undefined, 'Ok');
                 }).catch(e => callback(e));
         },
         getById: (req, callback) => {
-            Character.findById(req.params.cid)
+            Character.findOne({ _id: req.params.id, owner: req.user._id })
                 .lean()
-                .select('_id name stats')
+                .select('name stats')
                 .then((doc) => {
                     callback(undefined, doc);
                 }).catch(e => callback(e));
@@ -97,7 +105,7 @@ module.exports = db = {
                 maxValue: req.body.maximum,
                 statType: req.body.type
             }
-            Character.findByIdAndUpdate(req.params.cid, { $push: { stats: statObj } }, { safe: true, new: true, runValidators: true })
+            Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id }, { $push: { stats: statObj } }, { safe: true, new: true, runValidators: true })
                 .then((doc) => {
                     callback(undefined, doc.stats);
                 }).catch(e => callback(e));
@@ -109,13 +117,13 @@ module.exports = db = {
                 maxValue: req.body.maximum,
                 statType: req.body.type
             }
-            Character.findOneAndUpdate({ _id: req.params.cid, 'stats.name': req.params.name }, { $set: { "stats.$": statObj } }, { safe: true, new: true, runValidators: true })
+            Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id, 'stats.name': req.body.name }, { $set: { "stats.$": statObj } }, { safe: true, new: true, runValidators: true })
                 .then((doc) => {
                     callback(undefined, req.body);
                 }).catch(e => callback(e));
         },
         deleteStatByName: (req, callback) => {
-            Character.findByIdAndUpdate(req.params.cid, { $pull: { stats: { name: req.params.name } } }, { safe: true, new: true })
+            Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id }, { $pull: { stats: { name: req.body.name } } }, { safe: true, new: true })
                 .then((doc) => {
                     callback(undefined, doc.stats);
                 }).catch(e => callback(e));
