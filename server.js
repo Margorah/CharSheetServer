@@ -33,7 +33,7 @@ dbCallSimple = (dbMethod, errCode, reqObj, resObj) => {
 
 // User
 server.post('/Users', (req, res) => {
-    dbCallSimple(db.user.post, 404, req, res);
+    dbCallSimple(db.user.post, 400, req, res);
 });
 
 server.get('/Users/Me', authenticate, (req, res) => {
@@ -45,11 +45,11 @@ server.post('/Users/Me', (req, res) => {
 });
 
 server.delete('/Users/Me', authenticate, (req, res) => {
-    dbCallSimple(db.user.logout, 400, req, res);
+    dbCallSimple(db.user.logout, 401, req, res);
 });
 
 server.patch('/Users/Password', authenticate, (req, res) => {
-    dbCallSimple(db.user.patchUserPass, 404, req, res);
+    dbCallSimple(db.user.patchUserPass, 401, req, res);
 });
 
 server.delete('/Users/', authenticate, (req, res) => {
