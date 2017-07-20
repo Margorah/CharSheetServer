@@ -14,8 +14,8 @@ module.exports = db = {
         post: (req, callback) => {
             var user = new User({
                 name: req.body.name,
-                email: req.body.email,
-                password: req.body.password.toLowerCase(),
+                email: req.body.email.toLowerCase(),
+                password: req.body.password,
                 characters: []
             });
             user.save().then(() => {
