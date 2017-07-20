@@ -15,7 +15,7 @@ module.exports = db = {
             var user = new User({
                 name: req.body.name,
                 email: req.body.email,
-                password: req.body.password,
+                password: req.body.password.toLowerCase(),
                 characters: []
             });
             user.save().then(() => {
@@ -28,7 +28,7 @@ module.exports = db = {
             callback(undefined, { id: req.user.id });
         },
         login: (req, callback) => {
-            User.findByCredentials(req.body.email, req.body.password)
+            User.findByCredentials(req.body.email.toLowerCase(), req.body.password)
                 .then((user) => {
                     return user.generateAuthToken().then((token) => {
                         callback(undefined, { id: user._id }, token);
