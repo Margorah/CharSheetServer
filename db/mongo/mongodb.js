@@ -31,7 +31,7 @@ module.exports = db = {
             User.findByCredentials(req.body.email.toLowerCase(), req.body.password)
                 .then((user) => {
                     return user.generateAuthToken().then((token) => {
-                        callback(undefined, { id: user._id }, token);
+                        callback(undefined, { id: user._id, name: user.name, email: user.email }, token);
                     });
                 }).catch(e => callback(e));
         },
