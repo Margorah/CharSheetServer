@@ -89,7 +89,7 @@ server.patch('/Users/Characters/Stats', authenticate, (req, res) => {
     dbCallSimple(db.character.patchStatByName, 404, req, res);
 });
 
-server.delete('/Users/Characters/Stats', authenticate, (req, res) => {
+server.delete('/Users/Characters/:cid/Stats/:name', authenticate, (req, res) => {
     dbCallSimple(db.character.deleteStatByName, 404, req, res);
 });
 

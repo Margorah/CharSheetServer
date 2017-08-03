@@ -10,7 +10,7 @@ const authenticate = (req, callback, next) => {
         req.user = user;
         req.token = token;
         next();
-    }).catch(e => callback(e));
+    }).catch(e => Promise.reject(e));
 };
 
 module.exports = authenticate;

@@ -125,15 +125,15 @@ module.exports = db = {
                 maxValue: req.body.maximum,
                 statType: req.body.type
             }
-            Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id, 'stats.name': req.body.name }, { $set: { "stats.$": statObj } }, { safe: true, new: true, runValidators: true })
+            Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id, 'stats.name': req.body.name }, { $set: { "stats.$": statObj } }, { safe: true, runValidators: true })
                 .then((doc) => {
                     callback(undefined, req.body);
                 }).catch(e => callback(e));
         },
         deleteStatByName: (req, callback) => {
-            Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id }, { $pull: { stats: { name: req.body.name } } }, { safe: true, new: true })
+            Character.findOneAndUpdate({ _id: req.params.cid, owner: req.user._id }, { $pull: { stats: { name: req.params.name } } }, { safe: true, new: true })
                 .then((doc) => {
-                    callback(undefined, doc.stats);
+                    callback(undefined, true);
                 }).catch(e => callback(e));
         }
     }
