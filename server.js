@@ -97,3 +97,6 @@ server.delete('/Users/Characters/Stats', authenticate, (req, res) => {
 server.listen(process.env.PORT, process.env.HOSTNAME, () => {
     console.log(`Listening on ${process.env.HOSTNAME}:${process.env.PORT}`);
 });
+
+// Trying to find what is throwing that error
+process.on('unhandledRejection', r => console.log(r));
