@@ -93,9 +93,17 @@ module.exports = db = {
         getById: (req, callback) => {
             Character.findOne({ _id: req.params.id, owner: req.user._id })
                 .lean()
-                .select('name stats')
+                .select('stats')
                 .then((doc) => {
-                    callback(undefined, doc);
+                    let toReturn = doc.stats.map((stat) => {
+                        return {
+                            name: stat.name,
+                            value: stat.value,
+                            maximum: stat.maxValue,
+                            type: stat.statType
+                        }
+                    });
+                    callback(undefined, toReturn);
                 }).catch(e => callback(e));
         },
         postNewStat: (req, callback) => {
@@ -107,7 +115,7 @@ module.exports = db = {
             }
             Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id }, { $push: { stats: statObj } }, { safe: true, new: true, runValidators: true })
                 .then((doc) => {
-                    callback(undefined, doc.stats);
+                    callback(undefined, { name: req.body.name, value: req.body.value, maximum: req.body.maximum, type: req.body.type });
                 }).catch(e => callback(e));
         },
         patchStatByName: (req, callback) => {
