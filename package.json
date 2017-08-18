@@ -1,5 +1,5 @@
 {
-  "name": "charsheetng2 backend",
+  "name": "charsheetng2_backend",
   "version": "1.0.0",
   "description": "the node.js backend for the angular4 app",
   "main": "server.js",
