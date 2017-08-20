@@ -1,19 +1,23 @@
 {
-  "name": "charsheetng2_backend",
-  "version": "1.0.0",
-  "description": "the node.js backend for the angular4 app",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Fritz",
-  "license": "ISC",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "bluebird": "^3.5.0",
-    "body-parser": "^1.17.2",
-    "express": "^4.15.3",
-    "jsonwebtoken": "^7.4.1",
-    "mongoose": "^4.11.3"
-  }
+    "name": "charsheetng2_backend",
+    "version": "1.0.0",
+    "description": "the node.js backend for the Ionic 3 app",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "personal": "cross-env CONFIG=personal nodemon server.js"
+    },
+    "author": "Fritz",
+    "license": "ISC",
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "bluebird": "^3.5.0",
+        "body-parser": "^1.17.2",
+        "express": "^4.15.3",
+        "jsonwebtoken": "^7.4.1",
+        "mongoose": "^4.11.3"
+    },
+    "devDependencies": {
+        "cross-env": "^5.0.5"
+    }
 }

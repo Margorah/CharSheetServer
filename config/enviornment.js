@@ -1,12 +1,6 @@
-const env = process.env.NODE_ENV || 'development';
-const db = process.env.DATABASE || 'mongodb';
+const env = process.env.CONFIG || 'default';
+const CONFIG = require(`./${env}.json`);
 
-if (env === 'development' || env === 'test') {
-    const config = require('./config.json');
-    const envConfig = config[env][db];
+module.exports = CONFIG;
 
-    Object.keys(envConfig).forEach((key) => {
-        process.env[key] = envConfig[key];
-    });
-    require(process.env.PATH);
-}
+require(CONFIG.DATABASE.PATH);

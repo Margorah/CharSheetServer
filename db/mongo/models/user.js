@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcj = require('bcryptjs');
 
 const Character = require('./character');
+const CONFIG = require('../../../config/enviornment');
 
 var UserSchema = new mg.Schema({
     name: {
@@ -58,7 +59,7 @@ var UserSchema = new mg.Schema({
 UserSchema.methods.generateAuthToken = function() {
     var user = this;
     var access = 'auth';
-    var token = jwt.sign({ _id: user._id.toHexString(), access }, process.env.JWT_SECRET).toString();
+    var token = jwt.sign({ _id: user._id.toHexString(), access }, CONFIG.DATABASE.JWT_SECRET).toString();
 
     user.tokens.push({ access, token });
     return user.save().then(() => {
@@ -112,7 +113,7 @@ UserSchema.statics.findByToken = function(token) {
     var decoded;
 
     try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
+        decoded = jwt.verify(token, CONFIG.DATABASE.JWT_SECRET);
     } catch (e) {
         return Promise.reject('Invalid Token');
     }

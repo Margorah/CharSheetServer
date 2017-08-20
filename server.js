@@ -1,9 +1,9 @@
-require('./config/enviornment');
-
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const authenticate = require(process.env.AUTH);
+const CONFIG = require('./config/enviornment');
+
+const authenticate = require(CONFIG.DATABASE.AUTH);
 
 var server = express();
 
@@ -94,8 +94,8 @@ server.delete('/Users/Characters/:cid/Stats/:name', authenticate, (req, res) => 
 });
 
 // Hey! Listen!
-server.listen(process.env.PORT, process.env.HOSTNAME, () => {
-    console.log(`Listening on ${process.env.HOSTNAME}:${process.env.PORT}`);
+server.listen(CONFIG.HOST.PORT, CONFIG.HOST.NAME, () => {
+    console.log(`Listening on ${CONFIG.HOST.NAME}:${CONFIG.HOST.PORT}`);
 });
 
 // Trying to find what is throwing that error

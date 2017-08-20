@@ -1,0 +1,12 @@
+{
+    "DATABASE": {
+        "PATH": "./../db/mongo/mongodb",
+        "MONGODB_URI": "mongodb://localhost:27017/CharSheetApp",
+        "AUTH": "./db/mongo/middleware/authenticate",
+        "JWT_SECRET": "zxc123^&*fg["
+    },
+    "HOST": {
+        "PORT": 3000,
+        "NAME": "localhost"
+    }
+}

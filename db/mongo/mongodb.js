@@ -3,9 +3,10 @@ const mongoose = require('mongoose');
 
 const User = require('./models/user');
 const Character = require('./models/character');
+const CONFIG = require('../../config/enviornment');
 
 mongoose.Promise = require('bluebird');
-var connectPromse = mongoose.connect(process.env.MONGODB_URI, {
+var connectPromse = mongoose.connect(CONFIG.DATABASE.MONGODB_URI, {
     useMongoClient: true
 });
 
