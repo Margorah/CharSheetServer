@@ -73,17 +73,17 @@ module.exports = db = {
                 owner: req.user._id,
                 stats: []
             });
-            char.save().then((charDoc) => {
-                req.user.update({ $push: { characters: charDoc._id } })
-                    .then(() => {
-                        callback(undefined, charDoc._id);
-                    }).catch(e => callback(e));
+            char.save().then(() => {
+                // req.user.update({ $push: { characters: charDoc._id } })
+                // .then(() => {
+                callback(undefined, true);
+                // }).catch(e => callback(e));
             }).catch(e => callback(e));
         },
         patchCharName: (req, callback) => {
             Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id }, { $set: { name: req.body.name } }, { safe: true, new: true, runValidators: true })
                 .then((doc) => {
-                    callback(doc.name);
+                    callback(undefined, doc.name);
                 }).catch(e => callback(e));
         },
         deleteCharById: (req, callback) => {
@@ -122,7 +122,7 @@ module.exports = db = {
                     callback(undefined, { name: req.body.name, value: req.body.value, maximum: req.body.maximum, type: req.body.type });
                 }).catch(e => callback(e));
         },
-        patchStatByName: (req, callback) => {
+        patchStatById: (req, callback) => {
             statObj = {
                 _id: req.body.id,
                 name: req.body.name,
@@ -130,13 +130,13 @@ module.exports = db = {
                 maxValue: req.body.maximum,
                 statType: req.body.type
             }
-            Character.findOneAndUpdate({ _id: req.body.cid, owner: req.user._id, 'stats.name': req.body.name }, { $set: { "stats.$": statObj } }, { safe: true, runValidators: true })
+            Character.findOneAndUpdate({ _id: req.body.cid, owner: req.user._id, 'stats._id': req.body.id }, { $set: { "stats.$": statObj } }, { safe: true, runValidators: true })
                 .then((doc) => {
                     callback(undefined, req.body);
                 }).catch(e => callback(e));
         },
-        deleteStatByName: (req, callback) => {
-            Character.findOneAndUpdate({ _id: req.params.cid, owner: req.user._id }, { $pull: { stats: { name: req.params.name } } }, { safe: true, new: true })
+        deleteStatById: (req, callback) => {
+            Character.findOneAndUpdate({ _id: req.params.cid, owner: req.user._id }, { $pull: { stats: { _id: req.params.sid } } }, { safe: true, new: true })
                 .then((doc) => {
                     callback(undefined, true);
                 }).catch(e => callback(e));

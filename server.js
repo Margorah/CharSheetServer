@@ -86,11 +86,11 @@ server.post('/Users/Characters/Stats', authenticate, (req, res) => {
 });
 
 server.patch('/Users/Characters/Stats', authenticate, (req, res) => {
-    dbCallSimple(db.character.patchStatByName, 404, req, res);
+    dbCallSimple(db.character.patchStatById, 404, req, res);
 });
 
-server.delete('/Users/Characters/:cid/Stats/:name', authenticate, (req, res) => {
-    dbCallSimple(db.character.deleteStatByName, 404, req, res);
+server.delete('/Users/Characters/:cid/Stats/:sid', authenticate, (req, res) => {
+    dbCallSimple(db.character.deleteStatById, 404, req, res);
 });
 
 // Hey! Listen!
