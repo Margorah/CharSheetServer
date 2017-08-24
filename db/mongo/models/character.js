@@ -2,6 +2,11 @@ const mg = require('mongoose');
 const User = require('./user');
 
 var StatSchema = new mg.Schema({
+    _id: {
+        type: String,
+        required: true,
+        minlength: 7
+    },
     name: {
         type: String,
         required: true,
@@ -21,9 +26,14 @@ var StatSchema = new mg.Schema({
         minlength: 2,
         default: 'MDC'
     }
-}, { _id: false });
+});
 
 var CharacterSchema = new mg.Schema({
+    _id: {
+        type: String,
+        required: true,
+        minlength: 7
+    },
     name: {
         type: String,
         required: true,

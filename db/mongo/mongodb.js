@@ -68,6 +68,7 @@ module.exports = db = {
         },
         postNewChar: (req, callback) => {
             var char = new Character({
+                _id: req.body.cid,
                 name: req.body.name,
                 owner: req.user._id,
                 stats: []
@@ -98,6 +99,7 @@ module.exports = db = {
                 .then((doc) => {
                     let toReturn = doc.stats.map((stat) => {
                         return {
+                            id: stat._id,
                             name: stat.name,
                             value: stat.value,
                             maximum: stat.maxValue,
@@ -109,24 +111,26 @@ module.exports = db = {
         },
         postNewStat: (req, callback) => {
             statObj = {
+                _id: req.body.id,
                 name: req.body.name,
                 value: req.body.value,
                 maxValue: req.body.maximum,
                 statType: req.body.type
             }
-            Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id }, { $push: { stats: statObj } }, { safe: true, new: true, runValidators: true })
+            Character.findOneAndUpdate({ _id: req.body.cid, owner: req.user._id }, { $push: { stats: statObj } }, { safe: true, new: true, runValidators: true })
                 .then((doc) => {
                     callback(undefined, { name: req.body.name, value: req.body.value, maximum: req.body.maximum, type: req.body.type });
                 }).catch(e => callback(e));
         },
         patchStatByName: (req, callback) => {
             statObj = {
+                _id: req.body.id,
                 name: req.body.name,
                 value: req.body.value,
                 maxValue: req.body.maximum,
                 statType: req.body.type
             }
-            Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id, 'stats.name': req.body.name }, { $set: { "stats.$": statObj } }, { safe: true, runValidators: true })
+            Character.findOneAndUpdate({ _id: req.body.cid, owner: req.user._id, 'stats.name': req.body.name }, { $set: { "stats.$": statObj } }, { safe: true, runValidators: true })
                 .then((doc) => {
                     callback(undefined, req.body);
                 }).catch(e => callback(e));

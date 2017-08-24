@@ -18,14 +18,14 @@ var UserSchema = new mg.Schema({
         minlength: 6,
         trim: true,
         unique: true,
-        lowercase: true,
-        validate: {
-            validator: (value) => {
-                var regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return regex.test(value)
-            },
-            message: '{VALUE} is not a valid email'
-        }
+        lowercase: true
+            // validate: {
+            //     validator: (value) => {
+            //         var regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            //         return regex.test(value)
+            //     },
+            //     message: '{VALUE} is not a valid email'
+            // }
     },
     password: {
         type: String,
