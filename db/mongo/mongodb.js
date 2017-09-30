@@ -55,6 +55,15 @@ module.exports = db = {
             req.user.remove().then(() => {
                 callback(undefined, 'User Removed');
             }).catch(e => callback(e));
+        },
+        checkEmailAvail: (req, callback) => {
+            User.find({ email: req.body.email }).then((users) => {
+                let response = true;
+                if (users.length > 0) {
+                    response = false;
+                }
+                callback(undefined, response);
+            }).catch(e => callback(e));
         }
     },
     character: {

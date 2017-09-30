@@ -57,6 +57,10 @@ server.delete('/Users/', authenticate, (req, res) => {
     dbCallSimple(db.user.deleteById, 400, req, res);
 });
 
+server.post('/Users/Email', (req, res) => {
+    dbCallSimple(db.user.checkEmailAvail, 400, req, res);
+});
+
 // Character
 server.get('/Users/Characters', authenticate, (req, res) => {
     dbCallSimple(db.character.getAll, 404, req, res);
