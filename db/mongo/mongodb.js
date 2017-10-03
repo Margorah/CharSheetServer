@@ -77,9 +77,10 @@ module.exports = db = {
         },
         postNewChar: (req, callback) => {
             var char = new Character({
-                _id: req.body.cid,
+                _id: req.body.id,
                 name: req.body.name,
                 owner: req.user._id,
+                updated: req.body.updated,
                 stats: []
             });
             char.save().then(() => {

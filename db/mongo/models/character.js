@@ -44,6 +44,11 @@ var CharacterSchema = new mg.Schema({
         type: mg.Schema.Types.ObjectId,
         ref: 'User'
     },
+    updated: {
+        required: true,
+        type: Date,
+        default: Date.now
+    },
     stats: [StatSchema]
 });
 
