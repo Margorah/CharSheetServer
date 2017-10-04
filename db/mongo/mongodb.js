@@ -140,7 +140,7 @@ module.exports = db = {
                 maxValue: req.body.maximum,
                 statType: req.body.type
             }
-            Character.findOneAndUpdate({ _id: req.body.cid, owner: req.user._id, 'stats._id': req.body.id }, { $set: { "stats.$": statObj } }, { safe: true, runValidators: true })
+            Character.findOneAndUpdate({ _id: req.body.cid, owner: req.user._id, 'stats._id': req.body.id }, { $set: { "stats.$": statObj, updated: req.body.updated } }, { safe: true, runValidators: true })
                 .then((doc) => {
                     callback(undefined, req.body);
                 }).catch(e => callback(e));
