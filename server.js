@@ -78,11 +78,23 @@ server.patch('/Users/Characters/Name', authenticate, (req, res) => {
     dbCallSimple(db.character.patchCharName, 404, req, res);
 });
 
-// Rename a Character??
+server.get('/Users/Characters/:timestamp', authenticate, (req, res) => {
+    dbCallSimple(db.character.getMetaChanged, 404, req, res);
+});
 
 // Character - Stats
 server.get('/Users/Characters/:id', authenticate, (req, res) => {
     dbCallSimple(db.character.getById, 404, req, res);
+});
+
+server.get('/Users/Characters/:cid/Stats/:timestamp', authenticate, (req, res) => {
+    dbCallSimple(db.character.getStatChanged, 404, req, res);
+});
+
+// Where to put?
+
+server.get('/Users/Characters/Stats/:timestamp', authenticate, (req, res) => {
+    dbCallSimple(db.character.getChanged, 404, req, res);
 });
 
 server.post('/Users/Characters/Stats', authenticate, (req, res) => {

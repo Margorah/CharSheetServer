@@ -91,7 +91,7 @@ module.exports = db = {
             }).catch(e => callback(e));
         },
         patchCharName: (req, callback) => {
-            Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id }, { $set: { name: req.body.name } }, { safe: true, new: true, runValidators: true })
+            Character.findOneAndUpdate({ _id: req.body.id, owner: req.user._id }, { $set: { name: req.body.name, metaUpdated: req.body.updated } }, { safe: true, new: true, runValidators: true })
                 .then((doc) => {
                     callback(undefined, doc.name);
                 }).catch(e => callback(e));
@@ -100,6 +100,54 @@ module.exports = db = {
             Character.findOneAndRemove({ _id: req.body.id, owner: req.user._id })
                 .then(() => {
                     callback(undefined, 'Ok');
+                }).catch(e => callback(e));
+        },
+        getMetaChanged: (req, callback) => {
+            let timestamp = Number(req.params.timestamp);
+            Character.find({ owner: req.user._id, metaUpdated: { $gt: timestamp } })
+                .lean()
+                .select('_id name updated')
+                .then((docs) => {
+                    if (docs.length > 0) {
+                        callback(undefined, docs);
+                    } else {
+                        callback(undefined, 'None');
+                    }
+                }).catch(e => callback(e));
+        },
+        getStatChanged: (req, callback) => {
+            let timestamp = Number(req.params.timestamp);
+            Character.aggregate([
+                    { $match: { owner: req.user._id, _id: req.params.cid, "stats.updated": { $gt: timestamp } } },
+                    { $project: { _id: 1, stats: { $filter: { input: '$stats', as: 'stat', cond: { $gt: ['$$stat.updated', timestamp] } } } } }
+                ])
+                .then((docs) => {
+                    if (docs.length > 0) {
+                        callback(undefined, docs);
+                    } else {
+                        callback(undefined, 'None');
+                    }
+                }).catch(e => callback(e));
+        },
+        getChanged: (req, callback) => {
+            let timestamp = Number(req.params.timestamp);
+            Character.aggregate([
+                    { $match: { owner: req.user._id, $or: [{ "stats.updated": { $gt: timestamp } }, { metaUpdated: { $gt: timestamp } }] } },
+                    {
+                        $project: {
+                            _id: 1,
+                            // name: { $cond: [{ $gt: ['$metaUpdated', timestamp] }, 0, '$name'] },
+                            meta: { $cond: { if: { $gt: ['$metaUpdated', timestamp] }, then: { 'name': '$name', 'metaUpdated': '$metaUpdated' }, else: 0 } },
+                            stats: { $filter: { input: '$stats', as: 'stat', cond: { $gt: ['$$stat.updated', timestamp] } } }
+                        }
+                    }
+                ])
+                .then((docs) => {
+                    if (docs.length > 0) {
+                        callback(undefined, docs);
+                    } else {
+                        callback(undefined, 'None');
+                    }
                 }).catch(e => callback(e));
         },
         getById: (req, callback) => {
@@ -120,14 +168,17 @@ module.exports = db = {
                 }).catch(e => callback(e));
         },
         postNewStat: (req, callback) => {
-            statObj = {
+            var statObj = {
                 _id: req.body.id,
                 name: req.body.name,
                 value: req.body.value,
                 maxValue: req.body.maximum,
                 statType: req.body.type
+            };
+            if (req.body.updated) {
+                statObj[updated] = req.body.updated;
             }
-            Character.findOneAndUpdate({ _id: req.body.cid, owner: req.user._id }, { $push: { stats: statObj }, $set: { updated: req.body.updated } }, { safe: true, new: true, runValidators: true })
+            Character.findOneAndUpdate({ _id: req.body.cid, owner: req.user._id }, { $push: { stats: statObj } }, { safe: true, new: true, runValidators: true })
                 .then((doc) => {
                     callback(undefined, { name: req.body.name, value: req.body.value, maximum: req.body.maximum, type: req.body.type });
                 }).catch(e => callback(e));

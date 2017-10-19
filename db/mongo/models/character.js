@@ -25,6 +25,11 @@ var StatSchema = new mg.Schema({
         required: true,
         minlength: 2,
         default: 'MDC'
+    },
+    updated: {
+        type: Number,
+        required: true,
+        default: Date.now
     }
 });
 
@@ -44,9 +49,9 @@ var CharacterSchema = new mg.Schema({
         type: mg.Schema.Types.ObjectId,
         ref: 'User'
     },
-    updated: {
+    metaUpdated: {
         required: true,
-        type: Date,
+        type: Number,
         default: Date.now
     },
     stats: [StatSchema]
