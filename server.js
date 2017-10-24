@@ -83,30 +83,30 @@ server.get('/Users/Characters/:timestamp', authenticate, (req, res) => {
 });
 
 // Character - Stats
-server.get('/Users/Characters/:id', authenticate, (req, res) => {
-    dbCallSimple(db.character.getById, 404, req, res);
+server.get('/Users/Characters/:id/Stats', authenticate, (req, res) => {
+    dbCallSimple(db.stat.getById, 404, req, res);
 });
 
 server.get('/Users/Characters/:cid/Stats/:timestamp', authenticate, (req, res) => {
-    dbCallSimple(db.character.getStatChanged, 404, req, res);
+    dbCallSimple(db.stat.getStatChanged, 404, req, res);
 });
 
 // Where to put?
 
 server.get('/Users/Characters/Stats/:timestamp', authenticate, (req, res) => {
-    dbCallSimple(db.character.getChanged, 404, req, res);
+    dbCallSimple(db.stat.getChanged, 404, req, res);
 });
 
 server.post('/Users/Characters/Stats', authenticate, (req, res) => {
-    dbCallSimple(db.character.postNewStat, 404, req, res);
+    dbCallSimple(db.stat.postNewStat, 404, req, res);
 });
 
 server.patch('/Users/Characters/Stats', authenticate, (req, res) => {
-    dbCallSimple(db.character.patchStatById, 404, req, res);
+    dbCallSimple(db.stat.patchStatById, 404, req, res);
 });
 
 server.delete('/Users/Characters/:cid/Stats/:sid', authenticate, (req, res) => {
-    dbCallSimple(db.character.deleteStatById, 404, req, res);
+    dbCallSimple(db.stat.deleteStatById, 404, req, res);
 });
 
 // Hey! Listen!

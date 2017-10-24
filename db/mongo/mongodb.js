@@ -115,6 +115,8 @@ module.exports = db = {
                     }
                 }).catch(e => callback(e));
         },
+    },
+    stat: {
         getStatChanged: (req, callback) => {
             let timestamp = Number(req.params.timestamp);
             Character.aggregate([
