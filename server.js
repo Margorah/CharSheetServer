@@ -82,6 +82,10 @@ server.get('/Users/Characters/:timestamp', authenticate, (req, res) => {
     dbCallSimple(db.character.getMetaChanged, 404, req, res);
 });
 
+server.patch('/Users/Characters', authenticate, (req, res) => {
+    dbCallSimple(db.character.patchMetaChanges, 404, req, res);
+});
+
 // Character - Stats
 server.get('/Users/Characters/:id/Stats', authenticate, (req, res) => {
     dbCallSimple(db.stat.getById, 404, req, res);
@@ -103,6 +107,10 @@ server.post('/Users/Characters/Stats', authenticate, (req, res) => {
 
 server.patch('/Users/Characters/Stats', authenticate, (req, res) => {
     dbCallSimple(db.stat.patchStatById, 404, req, res);
+});
+
+server.patch('/Users/Characters/Stats/id', authenticate, (req, res) => {
+    dbCallSimple(db.stat.patchMultipleById, 404, req, res);
 });
 
 server.delete('/Users/Characters/:cid/Stats/:sid', authenticate, (req, res) => {

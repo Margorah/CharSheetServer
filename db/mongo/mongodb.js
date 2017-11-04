@@ -5,6 +5,9 @@ const User = require('./models/user');
 const Character = require('./models/character');
 const CONFIG = require('../../config/enviornment');
 
+const BULK = require('./methods/bulk');
+const CHANGETYPES = require('./models/changeTypes');
+
 mongoose.Promise = require('bluebird');
 var connectPromse = mongoose.connect(CONFIG.DATABASE.MONGODB_URI, {
     useMongoClient: true
@@ -115,6 +118,17 @@ module.exports = db = {
                     }
                 }).catch(e => callback(e));
         },
+        patchMetaChanges: (req, callback) => {
+            // Character.update({ owner: req.user._id, _id: { $in: req.charIds} })
+            // bulk = Character.
+            let bulk = BULK.buildChars(req.body, req.user._id);
+            try {
+                Character.bulkWrite(bulk, { ordered: true });
+            } catch (e) {
+                return callback(e);
+            }
+            return callback(undefined, bulk);
+        }
     },
     stat: {
         getStatChanged: (req, callback) => {
@@ -197,6 +211,16 @@ module.exports = db = {
                 .then((doc) => {
                     callback(undefined, req.body);
                 }).catch(e => callback(e));
+        },
+        patchMultipleById: (req, callback) => {
+            // let bulk = BULK.buildStatUpdates(req.body.stats, req.user._id, req.body.cid);
+            let bulk = BULK.buildUpdateWithStats(req.body, req.user._id, req.body.cid);
+            try {
+                Character.bulkWrite(bulk, { ordered: true });
+            } catch (e) {
+                return callback(e);
+            }
+            return callback(undefined, bulk);
         },
         deleteStatById: (req, callback) => {
             Character.findOneAndUpdate({ _id: req.params.cid, owner: req.user._id }, { $pull: { stats: { _id: req.params.sid } } }, { safe: true, new: true })
