@@ -5,7 +5,16 @@ function buildChars(chars, userId) {
     for (let char of chars) {
         let currObj;
         switch (char.changeType) {
+            case CHANGETYPES.UPDATE:
+                currObj = buildUpdateWithStats(char, userId, char.id);
+                arrayToReturn = arrayToReturn.concat(currObj);
+                break;
+            case CHANGETYPES.DELETE:
+                currObj = { deleteOne: { 'filter': { 'owner': userId, '_id': char.id } } };
+                arrayToReturn.push(currObj);
+                break;
             case CHANGETYPES.ADD:
+            default:
                 currObj = {
                     insertOne: {
                         "document": {
@@ -18,16 +27,8 @@ function buildChars(chars, userId) {
                 };
                 if (char.stats !== undefined) {
                     let stats = buildStats(char.stats);
-                    currObj.insertOne['stats'] = stats;
+                    currObj.insertOne.document['stats'] = stats;
                 }
-                arrayToReturn.push(currObj);
-                break;
-            case CHANGETYPES.UPDATE:
-                currObj = buildUpdateWithStats(char, userId, char.id);
-                arrayToReturn = arrayToReturn.concat(currObj);
-                break;
-            case CHANGETYPES.DELETE:
-                currObj = { deleteOne: { 'filter': { 'owner': userId, '_id': char.id } } };
                 arrayToReturn.push(currObj);
                 break;
         }
@@ -38,13 +39,6 @@ function buildChars(chars, userId) {
 function filterActions(stat, oldObj) {
     let newAction;
     switch (stat.changeType) {
-        case CHANGETYPES.ADD:
-            newAction = {
-                '$push': {
-                    'stats': buildStat(stat)
-                }
-            };
-            break;
         case CHANGETYPES.UPDATE:
             if (oldObj['$set'] !== undefined) {
                 // wierd recursiveness I do not like
@@ -64,6 +58,14 @@ function filterActions(stat, oldObj) {
                     'stats': {
                         '_id': stat.id
                     }
+                }
+            };
+            break;
+        case CHANGETYPES.ADD:
+            // default:
+            newAction = {
+                '$push': {
+                    'stats': buildStat(stat)
                 }
             };
             break;
