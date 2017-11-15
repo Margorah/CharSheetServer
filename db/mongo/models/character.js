@@ -1,3 +1,4 @@
+// jshint esversion: 6
 const mg = require('mongoose');
 const User = require('./user');
 

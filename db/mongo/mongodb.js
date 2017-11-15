@@ -1,5 +1,5 @@
+// jshint esversion: 6
 const mongoose = require('mongoose');
-// const ObjectID = require('mongodb');
 
 const User = require('./models/user');
 const Character = require('./models/character');
@@ -119,8 +119,6 @@ module.exports = db = {
                 }).catch(e => callback(e));
         },
         patchMetaChanges: (req, callback) => {
-            // Character.update({ owner: req.user._id, _id: { $in: req.charIds} })
-            // bulk = Character.
             let bulk = BULK.buildChars(req.body, req.user._id);
             try {
                 Character.bulkWrite(bulk, { ordered: true });
@@ -213,7 +211,6 @@ module.exports = db = {
                 }).catch(e => callback(e));
         },
         patchMultipleById: (req, callback) => {
-            // let bulk = BULK.buildStatUpdates(req.body.stats, req.user._id, req.body.cid);
             let bulk = BULK.buildUpdateWithStats(req.body, req.user._id, req.body.cid);
             try {
                 Character.bulkWrite(bulk, { ordered: true });

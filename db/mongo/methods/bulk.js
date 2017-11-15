@@ -1,6 +1,7 @@
+// jshint esversion: 6
 const CHANGETYPES = require('../models/changeTypes');
 
-function buildChars(chars, userId) {
+buildChars = (chars, userId) => {
     let arrayToReturn = [];
     for (let char of chars) {
         let currObj;
@@ -36,11 +37,11 @@ function buildChars(chars, userId) {
     return arrayToReturn;
 }
 
-function filterActions(stat, oldObj) {
+filterActions = (stat, oldObj) => {
     let newAction;
     switch (stat.changeType) {
         case CHANGETYPES.UPDATE:
-            if (oldObj['$set'] !== undefined) {
+            if (oldObj !== undefined) {
                 // wierd recursiveness I do not like
                 newAction = oldObj;
                 newAction['$set']['stats.$'] = buildStat(stat);
@@ -74,7 +75,7 @@ function filterActions(stat, oldObj) {
 }
 
 // Change server stats to have same member names as client?
-function buildStat(stat) {
+buildStat = (stat) => {
     return {
         '_id': stat.id,
         'name': stat.name,
@@ -85,7 +86,7 @@ function buildStat(stat) {
     };
 }
 
-function buildStats(stats) {
+buildStats = (stats) => {
     let statObj = [];
     for (let stat of stats) {
         let newStat = buildStat(stat);
@@ -94,7 +95,7 @@ function buildStats(stats) {
     return statObj;
 }
 
-function buildUpdateWithStats(char, userId, charId) {
+buildUpdateWithStats = (char, userId, charId) => {
     let returnArray = [];
     let statsArray;
     let updateObj = {};
@@ -122,7 +123,13 @@ function buildUpdateWithStats(char, userId, charId) {
         if (char.stats[0].changeType === CHANGETYPES.UPDATE) {
             filterObj['stats._id'] = char.stats[0].id;
         }
-        updateObj = filterActions(char.stats[0], updateObj);
+
+        // only pass updateObj if meta data was changed.
+        if (char.changeType !== undefined) {
+            currObj.updateOne.update = filterActions(char.stats[0], updateObj);
+        } else {
+            currObj.updateOne.update = filterActions(char.stats[0]);
+        }
 
         // Each subsequent stat change has to be in it's own object because of the potential conflict of editing the same array and mongo's parallel system. I think
 
@@ -147,9 +154,9 @@ function buildUpdateWithStats(char, userId, charId) {
 }
 
 module.exports = {
-    buildChars: buildChars,
-    filterActions: filterActions,
-    buildStat: buildStat,
-    buildStats: buildStats,
-    buildUpdateWithStats: buildUpdateWithStats
+    buildChars,
+    filterActions,
+    buildStat,
+    buildStats,
+    buildUpdateWithStats
 };
